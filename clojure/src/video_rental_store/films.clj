@@ -15,6 +15,7 @@
     (.setTitle title)))
 
 (def id (ref 0))
+;;TODO - in memory "database", can be replaced with a proper DB
 (def films-store (ref {}))
 
 (defn -new-id! []
