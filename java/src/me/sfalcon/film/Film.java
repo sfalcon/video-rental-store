@@ -14,6 +14,10 @@ public abstract class Film {
     protected double price;
     protected DateTime rentDeadline;
 
+    public Film (){
+        this.price = 30;
+    }
+
     public BigInteger getId(){
         return id;
     }
