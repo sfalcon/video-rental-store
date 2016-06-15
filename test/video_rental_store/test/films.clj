@@ -20,12 +20,12 @@
              (-> {:title "The spark 2" :type "regular"} film create!) => truthy)
        (fact "can update an existing film"
              (-> {:id 2 :title "The spark 2" :type "new"} film update! into-map)
-             => {:id 2 :title "The spark 2" :status "RENTABLE" :type "NewFilm"}))
+             => {:id 2 :title "The spark 2" :rentStatus "RENTABLE" :type "NewFilm"}))
 
 (facts "about reading saved films"
        (fact "can read a saved film"
-             (-> {:id 1} film lookup into-map) => {:id 1 :title "The spark" :type "RegularFilm" :status "RENTABLE"}
-             (-> {:id 2} film lookup into-map) => {:id 2 :title "The spark 2" :type "NewFilm" :status "RENTABLE"})
+             (-> {:id 1} film lookup into-map) => {:id 1 :title "The spark" :type "RegularFilm" :rentStatus "RENTABLE"}
+             (-> {:id 2} film lookup into-map) => {:id 2 :title "The spark 2" :type "NewFilm" :rentStatus "RENTABLE"})
        (fact "cannot read a non saved film"
              (-> {:id 8} film lookup) => falsey))
 

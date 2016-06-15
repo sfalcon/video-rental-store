@@ -38,7 +38,7 @@ public abstract class Film {
         this.title = title;
     }
 
-    public Status getStatus() {
+    public Status getRentStatus() {
         Status status;
         //A film is rentable if it doesn't have a deadline assigned
         if(this.rentDeadline == null){
@@ -66,7 +66,7 @@ public abstract class Film {
     public double rent(int days){
         if (days<=0)
             throw new AssertionError("Must rent for at least 1 day");
-        if (this.getStatus()==Status.RENTED)
+        if (this.getRentStatus()==Status.RENTED)
             throw new IllegalStateException("This film is currently rented");
         this.rentDeadline = DateTime.now().plusDays(days);
         double price = this.price;
@@ -77,7 +77,7 @@ public abstract class Film {
     }
 
     public double returnIt(){
-        if (this.getStatus()==Status.RENTABLE)
+        if (this.getRentStatus()==Status.RENTABLE)
             throw new IllegalStateException("This film is not rented");
         double extraCharge = 0;
         if (this.hasExceededRentPeriod())

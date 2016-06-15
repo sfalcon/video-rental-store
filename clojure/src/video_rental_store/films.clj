@@ -38,7 +38,7 @@
     (-> film-inst
         bean
         (dissoc :class)
-        (update :status str)
+        (update :rentStatus str)
         (assoc :type (-> film-inst type .getSimpleName)))
     {}))
 
@@ -53,7 +53,8 @@
     (dosync
       (let [id (-new-id!)]
         (. film-inst setId (str id))
-        (alter films-store #(assoc % id film-inst)))))
+        (alter films-store #(assoc % id film-inst))
+        film-inst)))
   (lookup [film-inst]
     (-lookup film-inst))
   (update! [film-inst]

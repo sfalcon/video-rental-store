@@ -37,7 +37,7 @@ public class Customer {
     }
 
     public double rent (Film film, int days){
-        assert(film != null && film.getStatus()== Status.RENTABLE);
+        assert(film != null && film.getRentStatus()== Status.RENTABLE);
         if (film instanceof NewFilm){
             this.bonusPoints += 2;
         }else{
