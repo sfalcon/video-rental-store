@@ -26,18 +26,11 @@
              (-> {:id 1} customer delete!) => true))
 
 (facts "about customers renting films"
-       (fact "a customer can rent films and be charged for them"
-             (-> {:id 1} customer (.rent (films/film {:id 1}) 1)) => 30.0)
-       (fact "a customer can return a film they've rented and be charged if returning late"
-             ;TODO - add tests for late returns when a proper mock is set
-             (let [customer (-> {:id 1} customer)
-                   film (films/film {:id 1})]
-               (-> customer (.rent film 1)) => 30.0
-               (-> customer (.returnFilm film)) => 0.0))
-       (fact "a customer cannot rent a film that is already rented"
-             (let [rented-film (doto (films/film {:id 1})
-                                 (.rent 1))]
-               (-> {:id 1} customer (.rent rented-film 1))) => (throws IllegalStateException))
-       (fact "a customer cannot return a film they don't have rented"
-             (let [not-rented-film (films/film {:id 1})]
-               (-> {:id 1} customer (.returnFilm not-rented-film))) => (throws IllegalStateException)))
+       (fact "a customer can only be assigned films he has rented"
+             (let [rented-film (doto (films/film {:id 1}) (.rent 1))
+                   not-rented-film (films/film {:id 2})]
+               (-> {:id 1} customer (.rent rented-film)) => nil
+               (-> {:id 1} customer (.rent not-rented-film)) => (throws IllegalArgumentException)))
+       (fact "a customer cannot return a film he doesn't hold rented"
+             (let [customer (-> {:id 1} customer)]
+               (.returnFilm customer (films/film {:id 1})) => (throws IllegalStateException))))

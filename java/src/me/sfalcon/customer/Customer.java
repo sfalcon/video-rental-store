@@ -36,32 +36,35 @@ public class Customer {
         this.id = idParser.fromString(id);
     }
 
-    public double rent (Film film, int days){
-        assert(film != null && film.getRentStatus()== Status.RENTABLE);
+    public void rent (Film film){
+        assert film != null;
+        if (film.getRentStatus()==Status.RENTABLE){
+            throw new IllegalArgumentException("Can only assign rented films to a customer");
+        }
         if (film instanceof NewFilm){
             this.bonusPoints += 2;
         }else{
             this.bonusPoints += 1;
         }
         rentedFilms.put(film.getId(), film);
-        return film.rent(days);
     }
 
-    public double returnFilm(BigInteger id){
+    public void returnFilm(BigInteger id){
         assert(id!=null);
         Film film = rentedFilms.get(id);
-        if (film==null) throw new IllegalStateException("This customer doesn't have this film rented");
-        return film.returnIt();
+        if (film == null)
+            throw new IllegalStateException("The customer doesn't have that film rented");
+        rentedFilms.remove(id);
     }
 
-    public double returnFilm(Film film){
+    public void returnFilm(Film film){
         assert(film != null);
-        return this.returnFilm(film.getId());
+        this.returnFilm(film.getId());
     }
 
-    public double returnFilm(String id){
+    public void returnFilm(String id){
         assert(id != null);
-        return this.returnFilm(idParser.fromString(id));
+        this.returnFilm(idParser.fromString(id));
     }
 
 
