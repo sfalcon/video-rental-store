@@ -114,8 +114,11 @@
       (wrap-json-body {:keywords? true})
       wrap-json-response))
 
-(defonce server (run-jetty #'app {:port 3000 :join? false}))
-(defn restart-server []
+;Uncomment if you want to debug on the repl
+#_(defonce server (run-jetty #'app {:port 3000 :join? false}))
+#_(defn restart-server []
   (.stop server)
   (.start server))
 
+(defn -main [& args]
+  (run-jetty #'app {:port 3000 :join? false}))

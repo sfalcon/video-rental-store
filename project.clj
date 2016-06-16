@@ -5,6 +5,7 @@
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :source-paths ["clojure/src"]
   :java-source-paths ["java/src"]
+  :test-paths ["test"]
   :main video-rental-store.server
 
   :dependencies [[org.clojure/clojure "1.8.0"]
@@ -12,10 +13,9 @@
                  [ring/ring-jetty-adapter "1.4.0"]
                  [ring/ring-json "0.4.0"]
                  [bidi "2.0.9"]
-                 [liberator "0.14.1"]
-                 [munge-tout "0.1.4"]
-                 [midje "1.8.3"]]
-  )
+                 [liberator "0.14.1"]]
+  :profiles {:dev {:dependencies [[midje "1.8.3"]]
+                   :plugins      [[lein-midje "3.2"]]}})
 
 
 
