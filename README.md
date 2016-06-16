@@ -17,15 +17,25 @@ In folder dev-resources of the project there are 3 suites of tests that can be i
 whichever individual requests you want to try from each collection).
 
 The endpoints implement GET, POST, PUT and DELETE methods. They all use json media type as input and output.
+
 These endpoints are:
+
 /film (POST)
+
 /film/:id (GET POST PUT DELETE)
+
 /customer (POST)
+
 /customer/:id (GET POST DELETE)
+
 /customer/:cust-id/rent/:film-id (POST)
+
 /customer/:cust-id/rent (POST) <-- for renting a list of films
+
 TODO: these endpoints not exposed yet
+
 /customer/:cust-id/return/:film-id (POST)
+
 /customer/:cust-id/return/ (POST) <-- for list of films to return
 
 ## License
