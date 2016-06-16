@@ -7,7 +7,8 @@
             [ring.adapter.jetty :refer (run-jetty)]
             [video-rental-store.protocols]
             [video-rental-store.films :as films]
-            [video-rental-store.customers :as customers]))
+            [video-rental-store.customers :as customers])
+  (:import (me.sfalcon.film Status)))
 
 (declare film customer renting)
 
@@ -58,15 +59,53 @@
                             (let [id (get-in ctx [:request :route-params :id])]
                               (delete! (customers/customer {:id id}))))})
 
-
+(defresource
+  renting
+  {:allowed-methods       [:post]
+   :available-media-types ["application/json"]
+   ;allow the operation only if all films are rentable
+   :allowed?              (fn allowed-handler [ctx]
+                            (let [films (->> (or (get-in ctx [:request :body :films])
+                                                 [(get-in ctx [:request :route-params :film-id])])
+                                             (map #(lookup (films/film {:id %}))))]
+                              (when (every? (complement nil?) films)
+                                (when (every? #(= (.getRentStatus %) Status/RENTABLE) films)
+                                  (assoc ctx :films films)))))
+   ;check that both customer and the films exist
+   :exists?               (fn exists-handler [ctx]
+                            (let [id (get-in ctx [:request :route-params :id])
+                                  customer (lookup (customers/customer {:id id}))
+                                  films (:films ctx)]
+                              (when (and customer
+                                         (not-any? nil? films))
+                                (-> ctx
+                                    (assoc :customer customer)
+                                    (assoc :films films)))))
+   :handle-created        (fn created-handler [ctx]
+                            {:charges (:charges ctx)})
+   :post!                 (fn post-handler [{:keys [films customer] :as ctx}]
+                            (let [days (Integer. (get-in ctx [:request :route-params :days]))
+                                  rent-film-charge #(-> % (.rent days))
+                                  charges (loop [charges 0
+                                                 films films]
+                                            (if (empty? films)
+                                              charges
+                                              (recur (+ charges (rent-film-charge (first films))) (rest films))))]
+                              ;transaction to lock renting and customer assignment
+                              (dosync
+                                (dorun (map #(. customer rent %) films))
+                                (update! customer))
+                              (assoc ctx :charges charges)))})
 
 (def routes
-  ["/" {"film"           film
-        ["film/" :id]    film
-        "customer"       customer
-        ["customer" :id] customer
-        ;["customer" :id "rent"]          renting
-        ;["customer" :id "rent" :film-id] renting
+  ["/" {"film"                                                  film
+        ["film/" :id]                                           film
+        "customer"                                              customer
+        ["customer/" :id]                                       customer
+        ["customer/" :id "/rent/days/" :days]                   renting
+        ["customer/" :id "/rent-film/" :film-id "/days/" :days] renting
+        ;["customer" :id "return"]                       return
+        ;["customer" :id "return/" :film-id]             return
         }])
 
 (def app
@@ -75,7 +114,6 @@
       (wrap-json-body {:keywords? true})
       wrap-json-response))
 
-;; TODO - Use components
 (defonce server (run-jetty #'app {:port 3000 :join? false}))
 (defn restart-server []
   (.stop server)
